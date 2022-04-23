@@ -753,6 +753,7 @@
   <ItemGroup>
     <Folder Include="App_Data\uploads\" />
     <Folder Include="Content\app\" />
+    <Folder Include="Images\Icons\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -999,14 +1000,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="Images\background-login.jpg" />
     <Content Include="Images\crown.png" />
-    <Content Include="Images\Icons\128x128.png" />
-    <Content Include="Images\Icons\144x144.png" />
-    <Content Include="Images\Icons\152x152.png" />
-    <Content Include="Images\Icons\192x192.png" />
-    <Content Include="Images\Icons\384x384.png" />
-    <Content Include="Images\Icons\512x512.png" />
-    <Content Include="Images\Icons\72x72.png" />
-    <Content Include="Images\Icons\96x96.png" />
     <Content Include="Images\logo-branco.png" />
     <Content Include="Images\logo-preto.png" />
     <Content Include="Images\pagSeguro.png" />
