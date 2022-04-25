@@ -24,7 +24,7 @@ jobs:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
      
     - name: Restore NuGet Packages
-      run: nuget restore SimpleFrameworkApp.sln
+      run: nuget restore SVES.sln
  
     - name: Build and Publish Web App
       run: msbuild SVES.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
