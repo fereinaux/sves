@@ -50,6 +50,7 @@ namespace Core.Business.Eventos
                 evento.TipoEvento = (TiposEventoEnum)model.TipoEvento;
                 evento.Numeracao = model.Numeracao;
                 evento.Valor = model.Valor;
+                evento.ValorTaxa = model.ValorTaxa;
 
                 eventoRepository.Update(evento);
             }
@@ -61,6 +62,7 @@ namespace Core.Business.Eventos
                     Numeracao = model.Numeracao,
                     Capacidade = model.Capacidade,
                     Valor = model.Valor,
+                    ValorTaxa = model.ValorTaxa,
                     TipoEvento = (TiposEventoEnum)model.TipoEvento,
                     Status = GetEventoAtivo() != null ?
                     StatusEnum.Encerrado :

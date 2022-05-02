@@ -82,7 +82,7 @@ namespace SysIgreja.Controllers
                    Status = x.Status.GetDescription()
                });
             ViewBag.MeioPagamentos = meioPagamentoBusiness.GetAllMeioPagamentos().ToList();
-            ViewBag.Valor = (int)ValoresPadraoEnum.TaxaEquipante;
+            ViewBag.Valor = eventosBusiness.GetEventoAtivo()?.ValorTaxa ?? 0;
             ViewBag.ContasBancarias = contaBancariaBusiness.GetContasBancarias().ToList()
                 .Select(x => new ContaBancariaViewModel
                 {
@@ -273,7 +273,7 @@ namespace SysIgreja.Controllers
                 Apelido = equipante.Nome,
                 Logo = eventoAtual.TipoEvento.GetNickname() + ".png",
                 Evento = $"{eventoAtual.TipoEvento.GetDescription()}",
-                Valor = eventoAtual.Valor.ToString("C", CultureInfo.CreateSpecificCulture("pt-BR")),
+                Valor = eventoAtual.ValorTaxa.ToString("C", CultureInfo.CreateSpecificCulture("pt-BR")),
                 DataEvento = eventoAtual.DataEvento.ToString("dd/MM/yyyy"),
             };
 

@@ -46,11 +46,13 @@ namespace SysIgreja.Controllers
         private readonly IMeioPagamentoBusiness meioPagamentoBusiness;
         private readonly IContaBancariaBusiness contaBancariaBusiness;
         private readonly IDatatableService datatableService;
+        private readonly IEventosBusiness eventosBusiness;
         private readonly IMapper mapper;
 
         public ParticipanteController(ILancamentoBusiness lancamentoBusiness, IEtiquetasBusiness etiquetasBusiness, IQuartosBusiness quartosBusiness, IEquipesBusiness equipesBusiness, IArquivosBusiness arquivoBusiness, ICirculosBusiness circulosBusiness, IParticipantesBusiness participantesBusiness, IContaBancariaBusiness contaBancariaBusiness, IConfiguracaoBusiness configuracaoBusiness, IEventosBusiness eventosBusiness, IAccountBusiness accountBusiness, IDatatableService datatableService, IMeioPagamentoBusiness meioPagamentoBusiness) : base(eventosBusiness, accountBusiness, configuracaoBusiness)
         {
             this.participantesBusiness = participantesBusiness;
+            this.eventosBusiness =eventosBusiness;
             this.arquivoBusiness = arquivoBusiness;
             this.quartosBusiness = quartosBusiness;
             this.equipesBusiness = equipesBusiness;
@@ -77,8 +79,9 @@ namespace SysIgreja.Controllers
             GetConfiguracao();
             GetCampos();
             ViewBag.MeioPagamentos = meioPagamentoBusiness.GetAllMeioPagamentos().ToList();
-            ViewBag.ValorRealista = (int)ValoresPadraoEnum.Inscricoes;
-            ViewBag.ValorEquipante = (int)ValoresPadraoEnum.TaxaEquipante;
+            var evento = eventosBusiness.GetEventoAtivo();
+            ViewBag.ValorRealista = evento?.Valor ?? 0;
+            ViewBag.ValorEquipante =  evento?.ValorTaxa ?? 0;
             ViewBag.ContasBancarias = contaBancariaBusiness.GetContasBancarias().ToList()
                 .Select(x => new ContaBancariaViewModel
                 {
@@ -112,8 +115,8 @@ namespace SysIgreja.Controllers
             GetEventos();
             GetConfiguracao();
             GetCampos();
-            ViewBag.MeioPagamentos = meioPagamentoBusiness.GetAllMeioPagamentos().ToList();
-            ViewBag.Valor = (int)ValoresPadraoEnum.Inscricoes;
+            ViewBag.MeioPagamentos = meioPagamentoBusiness.GetAllMeioPagamentos().ToList();            
+            ViewBag.Valor =  eventosBusiness.GetEventoAtivo()?.Valor ?? 0;
             ViewBag.ContasBancarias = contaBancariaBusiness.GetContasBancarias().ToList()
                 .Select(x => new ContaBancariaViewModel
                 {
@@ -261,7 +264,7 @@ namespace SysIgreja.Controllers
             {
                 Nome = UtilServices.CapitalizarNome(x.Nome),
                 Apelido = UtilServices.CapitalizarNome(x.Apelido),
-                Dia = x.DataNascimento.HasValue ? x.DataNascimento.Value.ToString("dd") : "", 
+                Dia = x.DataNascimento.HasValue ? x.DataNascimento.Value.ToString("dd") : "",
                 Idade = UtilServices.GetAge(x.DataNascimento).ToString()
             }).ToList();
 
@@ -354,7 +357,7 @@ namespace SysIgreja.Controllers
                 .GetParticipantesByEvento(model.EventoId);
                 var data = mapper.Map<IEnumerable<ParticipanteExcelViewModel>>(result);
 
-                Session[g.ToString()] = datatableService.GenerateExcel(data.ToList()); 
+                Session[g.ToString()] = datatableService.GenerateExcel(data.ToList());
 
                 return Content(g.ToString());
             }
