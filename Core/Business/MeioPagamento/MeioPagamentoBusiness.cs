@@ -32,12 +32,12 @@ namespace Core.Business.MeioPagamento
 
         public IQueryable<Data.Entities.MeioPagamento> GetMeioPagamentos()
         {
-             return meioPagamentoRepository.GetAll(mp => mp.IsEditavel == true);
+            return meioPagamentoRepository.GetAll(mp => mp.IsEditavel == true);
         }
 
         public IQueryable<Data.Entities.MeioPagamento> GetAllMeioPagamentos()
         {
-            return meioPagamentoRepository.GetAll();
+            return meioPagamentoRepository.GetAll().OrderByDescending(x => x.Lancamentos.Count(y => y.Id == x.Id));
         }
 
         public void PostMeioPagamento(PostMeioPagamentoModel model)
@@ -59,7 +59,7 @@ namespace Core.Business.MeioPagamento
                 {
                     Descricao = model.Descricao,
                     Taxa = model.Taxa,
-                    Status = StatusEnum.Ativo, 
+                    Status = StatusEnum.Ativo,
                     IsEditavel = true
                 };
 

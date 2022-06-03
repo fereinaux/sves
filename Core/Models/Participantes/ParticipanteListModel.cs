@@ -31,11 +31,11 @@ namespace Core.Models.Participantes
         public string Sexo { get; set; }
         public string Fone { get; set; }
         public string Status { get; set; }
-        public string Circulo { get; set; }
         public bool Checkin { get; set; }
         public bool HasVacina { get; set; }
         public bool HasFoto { get; set; }
         public bool HasContact { get; set; }
+        public string Circulo { get; set; }
         public string Padrinho { get; set; }
         public string NomePai { get; set; }
         public string FonePai { get; set; }

@@ -1,6 +1,7 @@
 ﻿var realista = {}
+let table
 eventoId = 0
-function CarregarTabelaParticipante() {
+function CarregarTabelaParticipante(callbackFunction) {
     if ($("#participante-eventoid").val() != eventoId) {
         $.ajax({
             url: '/Participante/GetPadrinhos',
@@ -114,7 +115,7 @@ ${GetButton('Pagamentos', JSON.stringify(row), 'verde', 'far fa-money-bill-alt',
                             </label>`: `<span style="font-size:18px" class="text-success p-l-xs pointer" onclick="toggleFoto(${data})"><i class="fa fa-camera" aria-hidden="true" title="Foto"></i></span>`
                         }
                             ${GetAnexosButton('Anexos', data, row.QtdAnexos)}
-                            <a target="_blank" href='https://api.whatsapp.com/send?phone=${row.Fone}' style="font-size:18px; color:green; " class="pointer p-l-xs"><i class="fab fa-whatsapp" aria-hidden="true" title="${row.Fone}"></i></a>
+${GetIconWhatsApp(row.Fone)}
                             ${GetButton('EditParticipante', data, 'blue', 'fa-edit', 'Editar')}      
                          
                             ${GetButton('Opcoes', JSON.stringify(row), 'cinza', 'fas fa-info-circle', 'Opções')}
@@ -138,11 +139,17 @@ ${GetButton('MakeEquipante', data, 'green', 'fa-broom', 'Equipante')}
         order: [
             [2, "asc"]
         ],
+        drawCallback: function () {
+            if (callbackFunction) {
+                callbackFunction()
+            }
+        },
         ajax: {
             url: '/Participante/GetParticipantesDatatable',
             data: { EventoId: $("#participante-eventoid").val(), PadrinhoId: $("#participante-padrinhoid").val(), Status: $("#participante-status").val() != 999 ? $("#participante-status").val() : null, Etiquetas: $("#participante-marcadores").val(), NaoEtiquetas: $("#participante-nao-marcadores").val() },
             datatype: "json",
             type: "POST"
+
         }
     };
 
@@ -160,7 +167,8 @@ ${GetButton('MakeEquipante', data, 'green', 'fa-broom', 'Equipante')}
         }
     });
 
-    $("#table-participante").DataTable(tableParticipanteConfig);
+    table = $("#table-participante").DataTable(tableParticipanteConfig);
+
 }
 
 function ConfirmFoto() {
@@ -895,6 +903,25 @@ function PostPagamento() {
     }
 }
 
+function previous() {
+    PostInfo(function () {
+        arrayData = table.data().toArray()
+        let index = arrayData.findIndex(r => r.Id == realista.Id)
+        if (index > 0) {
+            Opcoes(arrayData[index - 1])
+        }
+    })
+}
+
+function next() {
+    PostInfo(function () {
+        arrayData = table.data().toArray()
+        let index = arrayData.findIndex(r => r.Id == realista.Id)
+        if (index + 1 < arrayData.length) {
+            Opcoes(arrayData[index + 1])
+        }
+    })
+}
 
 function Opcoes(row) {
     realista = row;
@@ -913,34 +940,42 @@ function Opcoes(row) {
             $('.paitext').text(realista.NomePai)
             $('.convitetext').text(realista.NomeConvite)
             $('.contatotext').text(realista.NomeContato)
-
-            $('.pagamento').show()
             $('#participante-obs').val(realista.Observacao)
-            $(`#participante-msgcovid`).iCheck(realista.MsgVacina ? 'check' : 'uncheck');
-            $(`#participante-msgpagamento`).iCheck(realista.MsgPagamento ? 'check' : 'uncheck');
-            $(`#participante-msgnoitita`).iCheck(realista.MsgNoitita ? 'check' : 'uncheck');
-            $(`#participante-msggeral`).iCheck(realista.MsgGeral ? 'check' : 'uncheck');
-            $(`#participante-msgfoto`).iCheck(realista.MsgFoto ? 'check' : 'uncheck');
-
-            $.ajax({
-                url: "/Mensagem/GetMensagens/",
-                datatype: "json",
-                type: "POST",
-                contentType: 'application/json; charset=utf-8',
-                success: function (dataMsg) {
-                    $("#msg-list").html(`
+            if ($('#modal-opcoes').is(":hidden")) {
+                $.ajax({
+                    url: "/Mensagem/GetMensagens/",
+                    datatype: "json",
+                    type: "POST",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (dataMsg) {
+                        $("#msg-list").html(`
 ${dataMsg.data.map(p => `<option value=${p.Id}>${p.Titulo}</option>`)}
 `)
 
-                }
-            })
-
+                    }
+                })
+            }
             $('#participante-etiquetas').html(`${data.Etiquetas.map(etiqueta => `<option data-cor="${etiqueta.Cor}" value=${etiqueta.Id}>${etiqueta.Nome}</option>`)
                 }`)
             $('#participante-etiquetas').val(data.Participante.Etiquetas.map(etiqueta => etiqueta.Id))
             if (realista.Status == "Confirmado") {
                 $('.pagamento').hide()
             }
+
+            arrayData = table.data().toArray()
+            let index = arrayData.findIndex(r => r.Id == row.Id)
+
+            $('#btn-previous').css('display', 'block')
+            $('#btn-next').css('display', 'block')
+            if (index == 0) {
+
+                $('#btn-previous').css('display', 'none')
+            }
+
+            if (index == arrayData.length - 1) {
+                $('#btn-next').css('display', 'none')
+            }
+
             $("#modal-opcoes").modal();
         }
     });
@@ -949,6 +984,10 @@ ${dataMsg.data.map(p => `<option value=${p.Id}>${p.Titulo}</option>`)}
 }
 
 $("#modal-opcoes").on('hidden.bs.modal', function () {
+    PostInfo()
+});
+
+function PostInfo(callback) {
     $.ajax({
         url: "/Participante/PostInfo/",
         datatype: "json",
@@ -966,10 +1005,10 @@ $("#modal-opcoes").on('hidden.bs.modal', function () {
                 Etiquetas: $('.participante-etiquetas').val()
             }),
         success: function () {
-            CarregarTabelaParticipante()
+            CarregarTabelaParticipante(callback)
         }
     });
-});
+}
 
 function GetParticipanteContato(id) {
     $.ajax({

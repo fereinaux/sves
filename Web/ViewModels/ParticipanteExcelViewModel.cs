@@ -34,7 +34,13 @@ namespace SysIgreja.ViewModels
         public string Alergia { get; set; }
         [DisplayName("Nome do Parente")]
         public string NomeParente { get; set; }
+        [DisplayName("Congregação")]
+        public string Congregacao { get; set; }
+
         [DisplayName("Situação")]
         public string Situacao { get; set; }
+        [DisplayName("Círculo")]
+        public string Circulo { get; set; }
+        public string Padrinho { get; set; }
     }
 }

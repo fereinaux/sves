@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Models.Etiquetas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace Core.Models.Equipantes
         public string Equipe { get; set; }
         public string Apelido { get; set; }
         public DateTime? DataNascimento { get; set; }
+        public IEnumerable<PostEtiquetaModel> EtiquetasList { get; set; }
         public string Email { get; set; }
         public string Fone { get; set; }
         public bool HasRestricaoAlimentar { get; set; }

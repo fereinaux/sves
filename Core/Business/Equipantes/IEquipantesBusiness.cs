@@ -13,5 +13,6 @@ namespace Core.Business.Equipantes
         void ToggleVacina(int id);
         void ToggleTeste(int id);
         void ToggleCheckin(int id, int eventoid);
+        void PostEtiquetas(string[] etiquetas, int id);
     }
 }

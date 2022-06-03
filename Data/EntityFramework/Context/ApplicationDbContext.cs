@@ -120,6 +120,11 @@ namespace Data.Context
                 .WithOptionalDependent()
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<PresencaReuniao>()
+                .HasRequired<EquipanteEvento>(e => e.EquipanteEvento)
+                .WithMany(x => x.Presencas)
+                .WillCascadeOnDelete(true);
+
             modelBuilder.Entity<Circulo>()
                 .HasRequired<Evento>(c => c.Evento)
                 .WithMany()
@@ -147,6 +152,9 @@ namespace Data.Context
 
             modelBuilder.Entity<Participante>()
                 .HasMany(x => x.Arquivos);
+
+            modelBuilder.Entity<MeioPagamento>()
+           .HasMany(x => x.Lancamentos);
 
             modelBuilder.Entity<Participante>()
                 .HasMany(x => x.Circulos);

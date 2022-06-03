@@ -6,18 +6,24 @@ using System.Linq;
 using System.Data.Entity;
 using Utils.Enums;
 using Utils.Extensions;
+using Core.Business.Eventos;
+using System;
 
 namespace Core.Business.Equipantes
 {
     public class EquipantesBusiness : IEquipantesBusiness
     {
+        private readonly IEventosBusiness eventosBusiness;
         private readonly IGenericRepository<Equipante> equipanteRepository;
         private readonly IGenericRepository<EquipanteEvento> equipanteEventoRepository;
+        private readonly IGenericRepository<ParticipantesEtiquetas> ParticipantesEtiquetasRepo;
 
-        public EquipantesBusiness(IGenericRepository<Equipante> equipanteRepository, IGenericRepository<EquipanteEvento> equipanteEventoRepository)
+        public EquipantesBusiness(IGenericRepository<Equipante> equipanteRepository, IEventosBusiness eventosBusiness, IGenericRepository<EquipanteEvento> equipanteEventoRepository, IGenericRepository<ParticipantesEtiquetas> ParticipantesEtiquetasRepo)
         {
             this.equipanteRepository = equipanteRepository;
+            this.ParticipantesEtiquetasRepo = ParticipantesEtiquetasRepo;
             this.equipanteEventoRepository = equipanteEventoRepository;
+            this.eventosBusiness = eventosBusiness;
         }
 
         public void DeleteEquipante(int id)
@@ -32,8 +38,8 @@ namespace Core.Business.Equipantes
         }
 
         public IQueryable<Equipante> GetEquipantes()
-        {            
-            return equipanteRepository.GetAll();
+        {
+            return equipanteRepository.GetAll().Include(x => x.ParticipantesEtiquetas).Include(x => x.ParticipantesEtiquetas.Select(y => y.Etiqueta));
         }
 
         public Equipante PostEquipante(PostEquipanteModel model)
@@ -56,12 +62,12 @@ namespace Core.Business.Equipantes
                 equipante.HasRestricaoAlimentar = model.HasRestricaoAlimentar;
                 equipante.RestricaoAlimentar = model.HasRestricaoAlimentar ? model.RestricaoAlimentar : null;
                 equipante.Sexo = model.Sexo;
-                equipante.HasVacina = model.HasVacina;                
+                equipante.HasVacina = model.HasVacina;
 
                 equipanteRepository.Update(equipante);
             }
             else
-            {                       
+            {
                 equipante = new Equipante
                 {
                     Nome = model.Nome,
@@ -80,8 +86,8 @@ namespace Core.Business.Equipantes
                 };
 
                 equipanteRepository.Insert(equipante);
-            }         
-            
+            }
+
             equipanteRepository.Save();
             return equipante;
         }
@@ -111,11 +117,28 @@ namespace Core.Business.Equipantes
         }
 
         public void ToggleCheckin(int id, int eventoid)
-        {           
+        {
             var equipante = equipanteEventoRepository.GetAll(x => x.EventoId == eventoid && x.EquipanteId == id).FirstOrDefault();
             equipante.Checkin = !equipante.Checkin;
             equipanteEventoRepository.Update(equipante);
             equipanteEventoRepository.Save();
+        }
+
+        public void PostEtiquetas(string[] etiquetas, int id)
+        {
+            Equipante equipante = equipanteRepository.GetById(id);
+
+            var eventoAtivo = eventosBusiness.GetEventoAtivo();
+            ParticipantesEtiquetasRepo.GetAll(x => x.EquipanteId == id).ToList().ForEach(etiqueta => ParticipantesEtiquetasRepo.Delete(etiqueta.Id));
+            if (etiquetas != null)
+            {
+                foreach (var etiqueta in etiquetas)
+                {
+                    ParticipantesEtiquetasRepo.Insert(new ParticipantesEtiquetas { EquipanteId = id, EventoId = eventoAtivo?.Id ?? null, EtiquetaId = Int32.Parse(etiqueta) });
+                }
+
+            }
+            ParticipantesEtiquetasRepo.Save();
         }
     }
 }
