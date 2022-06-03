@@ -202,7 +202,7 @@ namespace Core.Business.Quartos
                            .Include(x => x.Equipante)
                               .Include(x => x.Equipante.Equipes)
                            .ToList()
-                           .Where(x => x.Equipante.Equipes.Any() && x.Equipante.Equipes.LastOrDefault()?.EventoId == eventoId)
+                           .Where(x => x.Equipante.Equipes.Any() && x.Equipante.Equipes.OrderByDescending(z => z.Evento.DataEvento).LastOrDefault()?.EventoId == eventoId)
                            .Select(x => x.EquipanteId)
                            .ToList();
 
@@ -210,7 +210,7 @@ namespace Core.Business.Quartos
                  .GetAll(x => !listParticipantesId.Contains(x.Id))
                  .Include(x => x.Equipes)
                  .ToList()
-                 .Where(x => x.Equipes.Any() && x.Equipes.LastOrDefault()?.EventoId == eventoId)
+                 .Where(x => x.Equipes.Any() && x.Equipes.OrderByDescending(z => z.Evento.DataEvento).LastOrDefault()?.EventoId == eventoId)
                  .OrderBy(x => x.Nome)
                  .ToList();
 
