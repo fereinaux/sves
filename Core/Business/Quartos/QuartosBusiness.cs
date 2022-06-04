@@ -180,7 +180,9 @@ namespace Core.Business.Quartos
         public List<Participante> GetParticipantesSemQuarto(int eventoId)
         {
             var listParticipantesId = quartoParticipanteRepository
-                           .GetAll(x => x.Quarto.EventoId == eventoId && x.Participante.Status == StatusEnum.Confirmado && x.Quarto.TipoPessoa == TipoPessoaEnum.Participante)
+                           .GetAll(x => x.Quarto.EventoId == eventoId &&
+                           x.Participante.Status == StatusEnum.Confirmado && 
+                           x.Quarto.TipoPessoa == TipoPessoaEnum.Participante)
                            .Select(x => x.ParticipanteId)
                            .ToList();
 
@@ -201,16 +203,18 @@ namespace Core.Business.Quartos
                            .GetAll(x => x.Quarto.EventoId == eventoId && x.Quarto.TipoPessoa == TipoPessoaEnum.Equipante)
                            .Include(x => x.Equipante)
                               .Include(x => x.Equipante.Equipes)
+                              .Include(x => x.Equipante.Equipes.Select(y => y.Evento))
                            .ToList()
-                           .Where(x => x.Equipante.Equipes.Any() && x.Equipante.Equipes.OrderByDescending(z => z.Evento.DataEvento).LastOrDefault()?.EventoId == eventoId)
+                           .Where(x => x.Equipante.Equipes.Any() && x.Equipante.Equipes?.OrderByDescending(z => z.EventoId).LastOrDefault()?.EventoId == eventoId)
                            .Select(x => x.EquipanteId)
                            .ToList();
 
-            var listParticipantes = equipanteRepository
+            var listParticipantes  = equipanteRepository
                  .GetAll(x => !listParticipantesId.Contains(x.Id))
                  .Include(x => x.Equipes)
-                 .ToList()
-                 .Where(x => x.Equipes.Any() && x.Equipes.OrderByDescending(z => z.Evento.DataEvento).LastOrDefault()?.EventoId == eventoId)
+                 .Include(x => x.Equipes.Select(y => y.Evento))
+                 .ToList()            
+                 .Where(x => x.Equipes.Any() && x.Equipes?.OrderByDescending(z => z.EventoId).LastOrDefault()?.EventoId == eventoId)
                  .OrderBy(x => x.Nome)
                  .ToList();
 
