@@ -409,10 +409,10 @@ function CarregarEtiquetaIndividual(position) {
 }
 
 function ImprimirIndividual(data, position) {
-    var printDoc = new jsPDF('p', 'mm', 'a3');
+    var printDoc = new jsPDF('p', 'mm', 'letter');
     printDoc.setFont('helvetica', "normal")
     printDoc.setFontSize(18);
-    width = position % 2 == 0 ? 212 : 73;
+    width = position % 2 == 0 ? 162 : 55;
     multiplicador = 0;
 
     switch (position) {
@@ -461,16 +461,17 @@ function ImprimirIndividual(data, position) {
         default:
     }
     if ($('.tipo:checked').val() == 1) {
+
         var participante = data.Participante;
-        heightNome = multiplicador * 45;
-        heightApelido = multiplicador * 45;
-        heightNome += 60;
-        heightApelido += 50;
+        heightNome = multiplicador * 33.9;
+        heightApelido = multiplicador * 33.9;
+        heightNome += 42;
+        heightApelido += 32;
         printDoc.setFont('helvetica', "bold")
-        printDoc.setFontSize(30);
+        printDoc.setFontSize(18);
         printDoc.text(width, heightApelido, participante.Apelido, 'center');
         printDoc.setFont('helvetica', "normal")
-        printDoc.setFontSize(18);
+        printDoc.setFontSize(15);
         var splitNome = printDoc.splitTextToSize(participante.Nome, 100);
         printDoc.text(width, heightNome, splitNome, 'center');
 

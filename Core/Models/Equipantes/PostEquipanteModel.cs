@@ -14,6 +14,7 @@ namespace Core.Models.Equipantes
         public string Nome { get; set; }
         public string Equipe { get; set; }
         public string Apelido { get; set; }
+        public string Quarto { get; set; }
         public DateTime? DataNascimento { get; set; }
         public IEnumerable<PostEtiquetaModel> EtiquetasList { get; set; }
         public string Email { get; set; }
